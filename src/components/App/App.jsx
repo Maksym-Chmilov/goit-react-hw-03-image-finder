@@ -1,98 +1,146 @@
-import React, { Component } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { fetchImages } from 'services/image-api';
-import { AppBox, Message, MessageQuery } from './App.styled';
-import { Button } from '../Button/Button';
-import { ImageGallery } from '../ImageGallery/ImageGallery';
-import { Loader } from '../Loader/Loader';
-import { Modal } from '../Modal/Modal';
-import { Searchbar } from '../Searchbar/Searchbar';
+import React, {Component} from 'react';
+import { Modal } from 'components/Modal/Modal';
+import { AppBox } from './App.styled';
+import { Loader } from 'components/Loader/Loader';
+import { addFotoObj } from 'services/image-api';
+import { Errors } from 'components/Errors/Errors';
+import { Button } from 'components/Button/Button';
+import { Searchbar } from 'components/Searchbar/Searchbar';
+import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+
 
 export class App extends Component {
   state = {
-    query: '',
-    page: 1,
-    images: [],
-    totalHits: null,
+    inputSearch: 'random',
+    response: [],
+    loading: false,
+    pageNumber: 1,
+    button: false,
+    modal: false,
+    largeImageUrl: '',
+    errorMessage: false,
     isLoading: false,
-    showModal: false,
-    modalImage: '',
-    modalAlt: '',
   };
 
-  async componentDidUpdate(prevProps, prevState) {
+  formSubmitHandler = input => {
+    this.cleanState();
+
+    this.setState({
+      inputSearch: input,
+    });
+
+    if (this.state.inputSearch === '') {
+      this.setState({
+      inputSearch: 'random',
+    });
+    }
+  };
+
+  getFotos = async input => {
+    this.setState({ loading: true });
     try {
-      if (
-        this.state.query !== prevState.query ||
-        this.state.page !== prevState.page
-      ) {
-        this.setState({ isLoading: true });
+      const fotoObj = await addFotoObj(input, this.state.pageNumber);
 
-        const data = await fetchImages(this.state.query, this.state.page);
-        const { hits, totalHits } = data;
-
+      
+      if (this.state.response.length === 0) {
         this.setState({
-          images: [...this.state.images, ...hits],
-          totalHits,
-          isLoading: false,
+          response: fotoObj,
+          errorMessage: false,
+          isLoading: false
+          
+        });
+
+        
+        if (fotoObj.length === 0) {
+          this.setState({
+            errorMessage: true,
+          });
+        }
+      }
+      
+      else {
+        this.setState(prevState => ({
+          response: [...prevState.response, ...fotoObj],
+          isLoading: false
+        }));
+      }
+      
+      if (fotoObj.length === 12) {
+        this.setState({
+          button: true,
         });
       }
     } catch (error) {
-      toast.error('Something went wrong, please try again later');
-      this.setState({ isLoading: false });
+      console.log(error);
+    } finally {
+      this.setState({
+        loading: false,
+      });
     }
-  }
-
-  handleFormSubmit = object => {
-    const { query, page, images } = object;
-
-    this.setState({
-      query,
-      page,
-      images,
-    });
   };
 
   loadMore = () => {
+    
     this.setState(prevState => ({
-      page: prevState.page + 1,
+      pageNumber: prevState.pageNumber + 1,
     }));
   };
 
-  toggleModal = (modalImage, modalAlt) => {
-    this.setState(prevState => ({
-      showModal: !prevState.showModal,
-      modalImage,
-      modalAlt,
-    }));
+  handleModal = event => {
+    if (event === 'Escape' || event === undefined) {
+      this.setState({ modal: false });
+    }
   };
+
+  onImageClick = largeImage => {
+    this.setState({
+      modal: true,
+      largeImageUrl: largeImage,
+    });
+  };
+
+  cleanState = () => {
+     this.setState({
+      response: [],
+      pageNumber: 1,
+      button: false,
+    });
+  };
+
+ componentDidUpdate(prevProps, prevState) {
+   const { pageNumber, inputSearch } = this.state;
+   
+    if (
+        prevState.pageNumber !== pageNumber ||
+        prevState.inputSearch !== inputSearch
+    ) {
+      if (!this.state.isLoading) {
+        this.setState({isLoading: true}, () => {
+          this.getFotos(inputSearch);
+        });
+      }
+    }
+}
 
   render() {
+    const { response, largeImageUrl, button, modal, errorMessage } =
+      this.state;
     return (
       <AppBox>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery openModal={this.toggleModal} images={this.state.images} />
-        <ToastContainer
-          position="top-center"
-          autoClose={2000}
-          theme="colored"
-        />
-        {this.state.totalHits / 12 >= this.state.page &&
-          !this.state.isLoading && <Button onClick={this.loadMore} />}
+        <Searchbar clickSubmit={this.formSubmitHandler} />
+
         {this.state.isLoading && <Loader />}
-        {this.state.totalHits === 0 && (
-          <Message>
-            Sorry, there are no images matching your search:{' '}
-            <MessageQuery>"{this.state.query}"</MessageQuery>. Please try again.
-          </Message>
+
+        {response && (
+          <ImageGallery images={response} clickImage={this.onImageClick} />
         )}
-        {this.state.showModal && (
-          <Modal
-            modalImage={this.state.modalImage}
-            modalAlt={this.state.modalAlt}
-            closeModal={this.toggleModal}
-          />
+
+        {errorMessage && <Errors />}
+
+        {button && <Button clickMore={this.loadMore} />}
+
+        {modal && (
+          <Modal clickModal={this.handleModal} imgUrl={largeImageUrl} />
         )}
       </AppBox>
     );

@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import { toast } from 'react-toastify';
-
+import { Component } from 'react';
+import propTypes from 'prop-types';
 import {
   SearchbarBox,
   SearchForm,
@@ -11,29 +10,17 @@ import {
 
 export class Searchbar extends Component {
   state = {
-    query: '',
-    page: 1,
-    images: [],
+    input: '',
+  };
+  handleChange = e => {
+    this.setState({
+      input: e.currentTarget.value,
+    });
   };
 
-  handleQueryChange = event => {
-    this.setState({ query: event.currentTarget.value.toLowerCase() });
-  };
-
-  handleSubmit = event => {
-    event.preventDefault();
-    
-    if (this.state.query.trim() === '') {
-      toast.error('You did not enter anything to search');
-      return;
-    }
- 
-    this.props.onSubmit(this.state);
-    this.reset();
-  };
-
-  reset = () => {
-    this.setState({ query: '' });
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.clickSubmit(this.state.input);
   };
 
   render() {
@@ -45,15 +32,18 @@ export class Searchbar extends Component {
           </SearchFormBtn>
 
           <SearchFormInput
+            onChange={this.handleChange}
             type="text"
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            value={this.state.query}
-            onChange={this.handleQueryChange}
           />
         </SearchForm>
       </SearchbarBox>
     );
   }
 }
+
+Searchbar.propTypes = {
+  clickSubmit: propTypes.func.isRequired,
+};

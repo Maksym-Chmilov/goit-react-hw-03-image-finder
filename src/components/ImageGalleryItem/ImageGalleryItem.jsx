@@ -1,17 +1,20 @@
-import { GalleryItem, GalleryItemImg } from './ImageGalleryItem.styled';
 import propTypes from 'prop-types';
+import { GalleryItem, GalleryItemImg } from './ImageGalleryItem.styled';
 
-export const ImageGalleryItem = ({ smallImg, largeImg, alt, openModal }) => {
+export const ImageGalleryItem = ({ smallFoto, largeFoto, alt }) => {
   return (
-    <GalleryItem onClick={() => openModal(largeImg, alt)}>
-      <GalleryItemImg src={smallImg} alt={alt} />
+    <GalleryItem>
+      <GalleryItemImg
+        src={smallFoto}
+        alt={alt}
+        id={largeFoto}
+      />
     </GalleryItem>
   );
 };
 
 ImageGalleryItem.propTypes = {
-  smallImg: propTypes.string.isRequired,
-  largeImg: propTypes.string.isRequired,
+  smallFoto: propTypes.string.isRequired,
+  largeFoto: propTypes.string.isRequired,
   alt: propTypes.string.isRequired,
-  openModal: propTypes.func.isRequired,
 };

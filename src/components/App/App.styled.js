@@ -7,12 +7,3 @@ export const AppBox = styled.div`
   padding-bottom: 24px;
 `;
 
-export const Message = styled.p`
-  color: #3f51b5;
-  text-align: center;
-  font-size: 30px;
-`;
-
-export const MessageQuery = styled.span`
-  color: red;
-`;

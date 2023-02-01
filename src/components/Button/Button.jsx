@@ -1,14 +1,23 @@
-import { LoadMore } from './Button.styled';
+import {Component} from 'react';
 import propTypes from 'prop-types';
+import { LoadmoreBox, LoadMoreBtn } from './Button.styled';
 
-export const Button = ({ onClick }) => {
-  return (
-    <LoadMore onClick={onClick} type="button">
-      Load more
-    </LoadMore>
-  );
-};
+export class Button extends Component {
+
+    handleLoadMore = (e) => {
+    this.props.clickMore(e)
+}
+
+  render() {
+    return (
+      <LoadmoreBox>
+            <LoadMoreBtn
+            onClick={() => this.handleLoadMore()} >Load more</LoadMoreBtn>
+      </LoadmoreBox>
+    );
+  }
+}
 
 Button.propTypes = {
-  onClick: propTypes.func.isRequired,
+  clickMore: propTypes.func.isRequired,
 };

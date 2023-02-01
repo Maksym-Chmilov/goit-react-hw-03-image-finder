@@ -1,3 +1,4 @@
+import propTypes from 'prop-types';
 import { Vortex } from 'react-loader-spinner';
 
 export const Loader = () => {
@@ -12,4 +13,10 @@ export const Loader = () => {
       colors={['blue', 'blue', 'blue', 'yellow', 'yellow', 'yellow']}
     />
   );
+};
+
+Loader.propTypes = {
+  color: propTypes.string.isRequired,
+  loading: propTypes.bool.isRequired,
+  size: propTypes.number.isRequired,
 };
