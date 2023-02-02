@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Modal } from 'components/Modal/Modal';
 import { AppBox } from './App.styled';
 import { Loader } from 'components/Loader/Loader';
@@ -7,7 +7,6 @@ import { Errors } from 'components/Errors/Errors';
 import { Button } from 'components/Button/Button';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
-
 
 export class App extends Component {
   state = {
@@ -31,8 +30,8 @@ export class App extends Component {
 
     if (this.state.inputSearch === '') {
       this.setState({
-      inputSearch: 'random',
-    });
+        inputSearch: 'random',
+      });
     }
   };
 
@@ -41,30 +40,25 @@ export class App extends Component {
     try {
       const fotoObj = await addFotoObj(input, this.state.pageNumber);
 
-      
       if (this.state.response.length === 0) {
         this.setState({
           response: fotoObj,
           errorMessage: false,
-          isLoading: false
-          
+          isLoading: false,
         });
 
-        
         if (fotoObj.length === 0) {
           this.setState({
             errorMessage: true,
           });
         }
-      }
-      
-      else {
+      } else {
         this.setState(prevState => ({
           response: [...prevState.response, ...fotoObj],
-          isLoading: false
+          isLoading: false,
         }));
       }
-      
+
       if (fotoObj.length === 12) {
         this.setState({
           button: true,
@@ -80,7 +74,6 @@ export class App extends Component {
   };
 
   loadMore = () => {
-    
     this.setState(prevState => ({
       pageNumber: prevState.pageNumber + 1,
     }));
@@ -100,40 +93,35 @@ export class App extends Component {
   };
 
   cleanState = () => {
-     this.setState({
+    this.setState({
       response: [],
       pageNumber: 1,
       button: false,
     });
   };
 
- componentDidUpdate(prevProps, prevState) {
-   const { pageNumber, inputSearch } = this.state;
-   
+  componentDidUpdate(prevProps, prevState) {
+    const { pageNumber, inputSearch } = this.state;
+
     if (
-        prevState.pageNumber !== pageNumber ||
-        prevState.inputSearch !== inputSearch
+      prevState.pageNumber !== pageNumber ||
+      prevState.inputSearch !== inputSearch
     ) {
       if (!this.state.isLoading) {
-        this.setState({isLoading: true}, () => {
-          this.getFotos(inputSearch);
-        });
+        this.getFotos(inputSearch);
       }
     }
-}
+  }
 
   render() {
-    const { response, largeImageUrl, button, modal, errorMessage } =
-      this.state;
+    const { response, largeImageUrl, button, modal, errorMessage, isLoading } = this.state;
     return (
       <AppBox>
         <Searchbar clickSubmit={this.formSubmitHandler} />
 
-        {this.state.isLoading && <Loader />}
+        {isLoading && <Loader />}
 
-        {response && (
-          <ImageGallery images={response} clickImage={this.onImageClick} />
-        )}
+        <ImageGallery images={response} clickImage={this.onImageClick} />
 
         {errorMessage && <Errors />}
 

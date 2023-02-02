@@ -1,25 +1,25 @@
-import {Component} from 'react';
 import { GalleryList } from './ImageGallery.styled';
 import propTypes from 'prop-types';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
-
+import { Component } from 'react';
 
 export class ImageGallery extends Component {
-  handleImageClick = (e) => {
-     this.props.clickImage(e.target.id)
-  }
+  handleImageClick = () => {
+    this.props.clickImage();
+  };
+
   render() {
-    const { images } = this.props;
+    const { images, clickImage } = this.props;
     return (
-      <GalleryList onClick={this.handleImageClick}>
-        {images.map(image => {
+      <GalleryList>
+        {images.map(({ id, webformatURL, largeImageURL, tags }) => {
           return (
             <ImageGalleryItem
-              id={image.id}
-              key={image.id}
-              smallFoto={image.webformatURL}
-              largeFoto={image.largeImageURL}
-              alt={image.tags}
+              key={id}
+              smallPhoto={webformatURL}
+              largePhoto={largeImageURL}
+              alt={tags}
+              clickImage={clickImage}
             />
           );
         })}
@@ -31,13 +31,10 @@ export class ImageGallery extends Component {
 ImageGallery.propTypes = {
   images: propTypes.arrayOf(
     propTypes.shape({
-      id: propTypes.number,
       key: propTypes.number,
-      smallFoto: propTypes.string,
-      largeFoto: propTypes.string,
+      smallPhoto: propTypes.string,
+      largePhoto: propTypes.string,
       alt: propTypes.string,
     })
   ),
-  clickImage: propTypes.func.isRequired,
 };
-
