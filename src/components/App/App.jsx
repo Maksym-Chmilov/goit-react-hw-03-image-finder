@@ -107,14 +107,13 @@ export class App extends Component {
       prevState.pageNumber !== pageNumber ||
       prevState.inputSearch !== inputSearch
     ) {
-      if (!this.state.isLoading) {
-        this.getFotos(inputSearch);
-      }
+      this.getFotos(inputSearch);
     }
   }
 
   render() {
-    const { response, largeImageUrl, button, modal, errorMessage, isLoading } = this.state;
+    const { response, largeImageUrl, button, modal, errorMessage, isLoading } =
+      this.state;
     return (
       <AppBox>
         <Searchbar clickSubmit={this.formSubmitHandler} />
